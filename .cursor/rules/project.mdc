@@ -1,0 +1,117 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Project Development Guidelines
+
+This document outlines the coding standards, file naming conventions, and recommended folder structure for this React + TypeScript project. Adhering to these guidelines ensures consistency, maintainability, and collaboration efficiency.
+
+## 1. File Naming Conventions
+
+All files within the `src` directory must follow these naming conventions:
+
+*   **Components:** Use PascalCase and end with `.component.tsx`.
+    *   Example: `src/components/UserProfile/UserProfile.component.tsx`
+*   **Pages:** Use PascalCase and end with `.page.tsx`. These typically represent distinct views or routes.
+    *   Example: `src/pages/SettingsPage/SettingsPage.page.tsx`
+    *   **Helpers/Utilities:** Use camelCase or PascalCase (for classes) and end with `.helper.ts` or `.util.ts`. Place them in relevant `utils` or `helpers` directories, or within a specific page's `utils` folder if only used there.
+    *   Example: `src/pages/AuthPage/utils/validation.helper.ts`
+    *   Example: `src/utils/dateFormatter.util.ts`
+    *   **Tests:** Use the same base name as the file being tested, ending with `.test.ts` or `.test.tsx`. Co-locate tests with the source files (e.g., inside the component or page directory).
+    *   Example: `src/components/Button/Button.test.tsx`
+    *   Example: `src/pages/AuthPage/services/auth.service.test.ts`
+    *   **Configuration:** Use camelCase or kebab-case and end with `.config.ts`. Place in `src/config` or within a page's `config` folder if specific.
+    *   Example: `src/config/api.config.ts`
+    *   Example: `src/config/tracking-events.config.ts`
+    *   **Services/API:** Use camelCase and end with `.service.ts` or `.api.ts`. Place in `src/services` or within a page's `services` folder if specific.
+    *   Example: `src/services/userService.ts`
+    *   **Types/Interfaces:** Use PascalCase and end with `.types.ts`. Place shared types in `src/types`. Place page-specific types within the page directory (e.g., `src/pages/ProductsPage/types/product.types.ts`).
+    *   Example: `src/types/api.types.ts`
+    *   Example: `src/pages/ProductsPage/types/product.types.ts`
+    *   **Styles:** Use the component/page name with `.css`, `.module.css`, `.scss`, `.module.scss`, etc. Co-locate styles with their components/pages.
+    *   Example: `src/components/UserProfile/UserProfile.module.css`
+
+## 2. Folder Structure
+
+We recommend organizing the project structure primarily by pages, keeping related logic together.
+
+```
+src/
+├── App.tsx                 # Main application component, routing setup
+├── main.tsx                # Application entry point
+├── index.css               # Global styles entry
+├── assets/                 # Static assets (images, fonts)
+├── components/             # **Reusable** UI components shared across multiple pages
+│   ├── Button/
+│   │   ├── Button.component.tsx
+│   │   └── Button.module.css
+│   └── ...
+├── config/                 # Project-wide configuration (API keys, env variables)
+├── constants/              # Shared constants (route paths, enums, etc.)
+│   └── routes.constants.ts # Central definition for all route paths
+├── hooks/                  # Shared custom hooks used across pages
+├── lib/                    # External library configurations or wrappers (e.g., axios instance)
+├── pages/                  # Application pages/views, corresponding to routes
+│   ├── HomePage/           # Example: Home Page
+│   │   ├── HomePage.page.tsx
+│   │   ├── components/     # **Page-specific** components used only within HomePage
+│   │   │   └── WelcomeBanner.component.tsx
+│   │   ├── hooks/          # Hooks specific to HomePage
+│   │   ├── services/       # API calls specific to HomePage
+│   │   ├── utils/          # Utilities specific to HomePage
+│   │   ├── types/          # Types specific to HomePage
+│   │   ├── config/         # Config specific to HomePage (less common)
+│   │   └── HomePage.module.css
+│   ├── SettingsPage/       # Example: Settings Page
+│   │   ├── SettingsPage.page.tsx
+│   │   ├── components/
+│   │   │   └── ThemeToggle.component.tsx
+│   │   └── SettingsPage.module.css
+│   └── ...
+├── services/               # Shared API service logic (if not page-specific)
+├── styles/                 # Global styles, themes, variables
+├── types/                  # Shared TypeScript type definitions
+├── utils/                  # Shared utility functions
+└── __tests__/              # Top-level integration/e2e tests (unit tests co-located)
+
+```
+
+**Key Principles:**
+
+*   **Component Scope:**
+    *   Place **reusable** components (used in >1 place) in `src/components/`.
+    *   Place **page-specific** components (used only within one page) in `src/pages/PageName/components/`.
+*   **Co-location:** Keep related files for a specific component or page together (e.g., `Page.tsx`, `Page.module.css`, page-specific `components/`, `hooks/`, `services/`, `utils/`, `types/`, `config/`, `tests/`).
+*   **Modularity:** Group files by page to keep concerns separated.
+*   **Clear Naming:** Use descriptive names for files and folders following the conventions in Section 1.
+*   **Barrel Files (`index.ts`):** Use sparingly, mainly for exporting public APIs of complex page directories or component directories. Avoid deep nesting.
+
+## 3. React Best Practices
+
+*   **Functional Components & Hooks:** Prefer functional components and hooks over class components.
+*   **PropTypes/TypeScript:** Use TypeScript for static typing instead of `prop-types`. Define clear interfaces/types for props and state.
+*   **Component Composition:** Favor composition over inheritance. Build complex UIs by combining smaller, reusable components.
+*   **State Management:** Primarily use `@tanstack/react-query` for server state. For simple client-side state needs (e.g., theme, auth status), use React Context API or component state (`useState`, `useReducer`). Avoid prop drilling excessively.
+*   **Performance:** Use `React.memo`, `useCallback`, and `useMemo` judiciously to optimize performance where needed. Profile before optimizing.
+*   **Keys:** Always provide stable and unique `key` props when rendering lists.
+*   **Accessibility (a11y):** Write semantic HTML and use ARIA attributes where necessary. Test for accessibility.
+*   **Data Fetching:** Utilize `@tanstack/react-query` for all server state management, including data fetching, caching, synchronization, and updates. Define query keys clearly and structure queries/mutations logically, often within feature or service directories.
+*   **UI Library:** Use Material UI (MUI) as the primary component library for building the user interface. Leverage its components, theming capabilities, and styling solutions (like `sx` prop or `styled-components`/`emotion`).
+*   **Routing:**
+    *   Use `react-router` exclusively for client-side routing.
+    *   Define all route path strings as constants in `src/constants/routes.constants.ts`.
+    *   Declare routes declaratively within `App.tsx` (or a dedicated routing component imported by `App.tsx`), mapping paths from `routes.constants.ts` to their corresponding page components (`*.page.tsx`).
+    *   Ensure every page component (`*.page.tsx`) is assigned a route.
+    *   Use the `Link` component from `react-router-dom` or the `useNavigate` hook for programmatic navigation, always referencing paths via the constants file.
+
+## 4. TypeScript Best Practices
+
+*   **Strict Mode:** Enable `strict` mode in `tsconfig.json`.
+*   **Explicit Types:** Avoid `any` where possible. Use specific types or `unknown`.
+*   **Interfaces vs. Types:** Use interfaces for defining object shapes and types for unions, intersections, or primitives. Be consistent.
+*   **Readonly:** Use `readonly` modifiers for props and state that should not be mutated.
+*   **Utility Types:** Leverage built-in utility types like `Partial`, `Required`, `Pick`, `Omit`.
+
+By following these guidelines, we aim to create a high-quality, maintainable, and scalable codebase.
